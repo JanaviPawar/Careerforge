@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>CareerForge — Placement Preparation Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <style>
+        *{box-sizing:border-box;margin:0;padding:0}
+        :root{
+            --bg:#0d1117;--surface:#161b22;--surface2:#21262d;--border:#30363d;
+            --text:#e6edf3;--muted:#8b949e;--accent:#58a6ff;--green:#3fb950;
+            --amber:#d29922;--red:#f85149;--purple:#bc8cff;--teal:#39d353;
+            --radius:8px;--font:'Inter',sans-serif;
+        }
+        body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;line-height:1.6;min-height:100vh}
+
+        /* ── LAYOUT ── */
+        .page{display:none;min-height:100vh}
+        .page.active{display:block}
+
+        /* ── NAV ── */
+        nav{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;
+            display:flex;align-items:center;justify-content:space-between;height:56px;
+            position:sticky;top:0;z-index:100}
+        .nav-logo{font-weight:700;font-size:16px;color:var(--text);letter-spacing:-0.3px}
+        .nav-logo span{color:var(--accent)}
+        .nav-links{display:flex;gap:4px}
+        .nav-btn{background:none;border:none;color:var(--muted);cursor:pointer;
+            padding:6px 12px;border-radius:var(--radius);font-size:13px;font-family:var(--font);
+            transition:all .15s}
+        .nav-btn:hover,.nav-btn.active{background:var(--surface2);color:var(--text)}
+        .nav-right{display:flex;align-items:center;gap:8px}
+        .user-chip{background:var(--surface2);border:1px solid var(--border);border-radius:20px;
+            padding:4px 12px;font-size:12px;color:var(--muted)}
+        .logout-btn{background:none;border:1px solid var(--border);color:var(--muted);
+            cursor:pointer;padding:5px 12px;border-radius:var(--radius);
+            font-size:12px;font-family:var(--font);transition:all .15s}
+        .logout-btn:hover{border-color:var(--red);color:var(--red)}
+
+        /* ── HERO (landing) ── */
+        .hero{display:flex;flex-direction:column;align-items:center;justify-content:center;
+            min-height:calc(100vh - 56px);padding:40px 24px;text-align:center}
+        .hero-badge{background:rgba(88,166,255,.1);border:1px solid rgba(88,166,255,.25);
+            color:var(--accent);border-radius:20px;padding:4px 14px;font-size:12px;
+            display:inline-block;margin-bottom:24px}
+        .hero h1{font-size:clamp(28px,5vw,52px);font-weight:700;line-height:1.15;
+            letter-spacing:-1px;max-width:720px;margin-bottom:16px}
+        .hero h1 span{color:var(--accent)}
+        .hero p{color:var(--muted);max-width:520px;font-size:15px;margin-bottom:36px;line-height:1.8}
+        .btn-row{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+        .btn{padding:10px 24px;border-radius:var(--radius);font-size:14px;font-weight:500;
+            cursor:pointer;border:none;font-family:var(--font);transition:all .15s}
+        .btn-primary{background:var(--accent);color:#0d1117}
+        .btn-primary:hover{background:#79b8ff}
+        .btn-outline{background:none;border:1px solid var(--border);color:var(--text)}
+        .btn-outline:hover{border-color:var(--accent);color:var(--accent)}
+        .features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+            gap:16px;max-width:900px;margin:56px auto 0;text-align:left}
+        .feat-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;
+            padding:20px;transition:border-color .15s}
+        .feat-card:hover{border-color:var(--accent)}
+        .feat-icon{font-size:22px;margin-bottom:10px}
+        .feat-card h3{font-size:13px;font-weight:600;margin-bottom:6px}
+        .feat-card p{font-size:12px;color:var(--muted)}
+        .stack-row{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:40px}
+        .stack-pill{background:var(--surface2);border:1px solid var(--border);
+            border-radius:20px;padding:4px 14px;font-size:12px;color:var(--muted)}
+
+        /* ── AUTH ── */
+        .auth-wrap{display:flex;align-items:center;justify-content:center;
+            min-height:calc(100vh - 56px);padding:24px}
+        .auth-card{background:var(--surface);border:1px solid var(--border);
+            border-radius:12px;padding:36px;width:100%;max-width:400px}
+        .auth-card h2{font-size:18px;font-weight:600;margin-bottom:4px}
+        .auth-card .sub{color:var(--muted);font-size:13px;margin-bottom:28px}
+        .tabs{display:flex;gap:0;margin-bottom:24px;border-bottom:1px solid var(--border)}
+        .tab{background:none;border:none;font-family:var(--font);font-size:14px;
+            color:var(--muted);cursor:pointer;padding:8px 16px;border-bottom:2px solid transparent;
+            margin-bottom:-1px;transition:all .15s}
+        .tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+        .form-group{margin-bottom:16px}
+        .form-group label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px;font-weight:500}
+        .form-group input{width:100%;background:var(--bg);border:1px solid var(--border);
+            border-radius:var(--radius);padding:9px 12px;color:var(--text);
+            font-family:var(--font);font-size:14px;outline:none;transition:border .15s}
+        .form-group input:focus{border-color:var(--accent)}
+        .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+        .btn-full{width:100%;padding:10px;margin-top:4px}
+        .err{color:var(--red);font-size:12px;margin-top:12px;text-align:center;min-height:18px}
+        .success-msg{color:var(--green);font-size:12px;margin-top:12px;text-align:center}
+
+        /* ── APP SHELL ── */
+        .app-layout{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 56px)}
+        .sidebar{background:var(--surface);border-right:1px solid var(--border);padding:16px 12px}
+        .sidebar-section{margin-bottom:24px}
+        .sidebar-label{font-size:11px;color:var(--muted);font-weight:600;
+            letter-spacing:.5px;padding:0 8px;margin-bottom:6px;text-transform:uppercase}
+        .sidebar-item{display:flex;align-items:center;gap:10px;padding:8px 10px;
+            border-radius:var(--radius);cursor:pointer;color:var(--muted);
+            font-size:13px;transition:all .15s;border:none;background:none;
+            font-family:var(--font);width:100%;text-align:left}
+        .sidebar-item:hover{background:var(--surface2);color:var(--text)}
+        .sidebar-item.active{background:rgba(88,166,255,.1);color:var(--accent)}
+        .sidebar-item .icon{font-size:16px;min-width:18px}
+        .main-content{padding:24px;overflow-y:auto}
+
+        /* ── PANELS ── */
+        .panel{display:none}
+        .panel.active{display:block}
+        .page-title{font-size:20px;font-weight:600;margin-bottom:4px}
+        .page-sub{color:var(--muted);font-size:13px;margin-bottom:24px}
+
+        /* ── STAT CARDS ── */
+        .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:28px}
+        .stat-card{background:var(--surface);border:1px solid var(--border);
+            border-radius:10px;padding:18px 20px}
+        .stat-label{font-size:11px;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px}
+        .stat-value{font-size:26px;font-weight:700;line-height:1}
+        .stat-sub{font-size:11px;color:var(--muted);margin-top:4px}
+        .stat-green .stat-value{color:var(--green)}
+        .stat-blue  .stat-value{color:var(--accent)}
+        .stat-amber .stat-value{color:var(--amber)}
+        .stat-purple.stat-value{color:var(--purple)}
+
+        /* ── SECTION CARDS ── */
+        .card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:20px;margin-bottom:16px}
+        .card-title{font-size:14px;font-weight:600;margin-bottom:16px;
+            display:flex;align-items:center;gap:8px}
+        .card-title .icon{font-size:16px}
+
+        /* ── PROGRESS BARS ── */
+        .prog-item{margin-bottom:12px}
+        .prog-head{display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px}
+        .prog-head .lbl{color:var(--muted)}
+        .prog-bar{background:var(--surface2);border-radius:4px;height:6px;overflow:hidden}
+        .prog-fill{height:100%;border-radius:4px;transition:width .6s ease}
+
+        /* ── TABLE ── */
+        .table-wrap{overflow-x:auto}
+        table{width:100%;border-collapse:collapse}
+        th{font-size:11px;color:var(--muted);font-weight:500;text-align:left;
+            padding:8px 12px;border-bottom:1px solid var(--border);text-transform:uppercase;letter-spacing:.4px}
+        td{padding:10px 12px;font-size:13px;border-bottom:1px solid var(--border)}
+        tr:last-child td{border-bottom:none}
+        tr:hover td{background:var(--surface2)}
+
+        /* ── BADGES ── */
+        .badge{display:inline-block;padding:2px 9px;border-radius:12px;font-size:11px;font-weight:500}
+        .badge-green {background:rgba(63,185,80,.15);color:var(--green)}
+        .badge-blue  {background:rgba(88,166,255,.15);color:var(--accent)}
+        .badge-amber {background:rgba(210,153,34,.15);color:var(--amber)}
+        .badge-red   {background:rgba(248,81,73,.15);color:var(--red)}
+        .badge-purple{background:rgba(188,140,255,.15);color:var(--purple)}
+        .badge-gray  {background:var(--surface2);color:var(--muted)}
+
+        /* ── FORM INPUTS inside app ── */
+        .app-input{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);
+            padding:8px 12px;color:var(--text);font-family:var(--font);font-size:13px;
+            outline:none;transition:border .15s}
+        .app-input:focus{border-color:var(--accent)}
+        select.app-input option{background:var(--surface)}
+        .app-form{display:grid;gap:12px}
+        .app-form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+        .app-label{font-size:12px;color:var(--muted);margin-bottom:4px;font-weight:500}
+        .field{display:flex;flex-direction:column;gap:4px}
+
+        /* ── TOAST ── */
+        #toast{position:fixed;bottom:24px;right:24px;background:var(--surface2);
+            border:1px solid var(--border);border-radius:var(--radius);padding:10px 16px;
+            font-size:13px;z-index:999;transform:translateY(80px);opacity:0;
+            transition:all .25s;max-width:300px}
+        #toast.show{transform:translateY(0);opacity:1}
+        #toast.green{border-color:var(--green);color:var(--green)}
+        #toast.red{border-color:var(--red);color:var(--red)}
+
+        /* ── LOADING ── */
+        .spinner{display:inline-block;width:16px;height:16px;border:2px solid var(--border);
+            border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite}
+        @keyframes spin{to{transform:rotate(360deg)}}
+        .loading-row{display:flex;align-items:center;gap:8px;color:var(--muted);
+            padding:20px;justify-content:center;font-size:13px}
+
+        /* ── EMPTY STATE ── */
+        .empty{text-align:center;padding:48px 24px;color:var(--muted)}
+        .empty .big{font-size:32px;margin-bottom:8px}
+        .empty p{font-size:13px}
+
+        @media(max-width:640px){
+            .app-layout{grid-template-columns:1fr}
+            .sidebar{display:none}
+            .app-form-row{grid-template-columns:1fr}
+            .form-row{grid-template-columns:1fr}
+        }
+    </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════
+     LANDING PAGE
+════════════════════════════════════════════════ -->
+<div id="page-landing" class="page active">
+    <nav>
+        <div class="nav-logo">Career<span>Forge</span></div>
+        <div class="btn-row" style="gap:8px">
+            <button class="btn btn-outline" style="padding:7px 18px;font-size:13px" onclick="showAuth('login')">Log in</button>
+            <button class="btn btn-primary" style="padding:7px 18px;font-size:13px" onclick="showAuth('signup')">Get started</button>
+        </div>
+    </nav>
+    <div class="hero">
+        <div class="hero-badge">Placement Preparation Platform</div>
+        <h1>Manage your entire<br/><span>placement journey</span></h1>
+        <p>Track coding progress, aptitude scores, company applications, and mock interviews — all in one place.</p>
+        <div class="btn-row">
+            <button class="btn btn-primary" onclick="showAuth('signup')">Create free account</button>
+            <button class="btn btn-outline" onclick="showAuth('login')">Log in</button>
+        </div>
+        <div class="features-grid">
+            <div class="feat-card"><div class="feat-icon">💻</div><h3>Coding Tracker</h3><p>Track LeetCode, GFG, streaks, and topic-wise progress.</p></div>
+            <div class="feat-card"><div class="feat-icon">📊</div><h3>Aptitude Analytics</h3><p>Monitor Quant, Verbal, Logical & DI scores with weakness analysis.</p></div>
+            <div class="feat-card"><div class="feat-icon">🏢</div><h3>Company Prep</h3><p>Company-wise interview experiences and curated resources.</p></div>
+            <div class="feat-card"><div class="feat-icon">📋</div><h3>Application Tracker</h3><p>Track every application from applied → selected with status updates.</p></div>
+            <div class="feat-card"><div class="feat-icon">📄</div><h3>Resume Storage</h3><p>Upload and manage resume versions with cloud storage.</p></div>
+            <div class="feat-card"><div class="feat-icon">🎯</div><h3>Interview Scheduler</h3><p>Log mock interviews, track feedback, and measure performance.</p></div>
+        </div>
+        <div class="stack-row">
+            <span class="stack-pill">Java 17</span><span class="stack-pill">Spring Boot 3.2</span>
+            <span class="stack-pill">MySQL</span><span class="stack-pill">Redis</span>
+            <span class="stack-pill">JWT Auth</span><span class="stack-pill">AWS S3</span>
+            <span class="stack-pill">REST APIs</span>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     AUTH PAGE
+════════════════════════════════════════════════ -->
+<div id="page-auth" class="page">
+    <nav>
+        <div class="nav-logo" style="cursor:pointer" onclick="showPage('landing')">Career<span>Forge</span></div>
+    </nav>
+    <div class="auth-wrap">
+        <div class="auth-card">
+            <div class="tabs">
+                <button class="tab active" id="tab-login" onclick="switchTab('login')">Log in</button>
+                <button class="tab" id="tab-signup" onclick="switchTab('signup')">Sign up</button>
+            </div>
+
+            <!-- LOGIN FORM -->
+            <div id="form-login">
+                <div class="form-group">
+                    <label>Email address</label>
+                    <input type="email" id="login-email" placeholder="you@example.com"/>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="login-password" placeholder="Min 8 characters"/>
+                </div>
+                <button class="btn btn-primary btn-full" onclick="doLogin()">Log in</button>
+                <div class="err" id="login-err"></div>
+            </div>
+
+            <!-- SIGNUP FORM -->
+            <div id="form-signup" style="display:none">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Full name</label>
+                        <input type="text" id="su-name" placeholder="Rahul Sharma"/>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="su-email" placeholder="you@example.com"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="su-password" placeholder="Min 8 characters"/>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>College</label>
+                        <input type="text" id="su-college" placeholder="VNIT Nagpur"/>
+                    </div>
+                    <div class="form-group">
+                        <label>Branch</label>
+                        <input type="text" id="su-branch" placeholder="CSE"/>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Grad year</label>
+                        <input type="number" id="su-year" placeholder="2025"/>
+                    </div>
+                    <div class="form-group">
+                        <label>CGPA</label>
+                        <input type="number" id="su-cgpa" step="0.1" placeholder="8.5"/>
+                    </div>
+                </div>
+                <button class="btn btn-primary btn-full" onclick="doSignup()">Create account</button>
+                <div class="err" id="signup-err"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     MAIN APP
+════════════════════════════════════════════════ -->
+<div id="page-app" class="page">
+    <nav>
+        <div class="nav-logo">Career<span>Forge</span></div>
+        <div class="nav-links">
+            <button class="nav-btn active" onclick="switchPanel('dashboard')">Dashboard</button>
+            <button class="nav-btn" onclick="switchPanel('coding')">Coding</button>
+            <button class="nav-btn" onclick="switchPanel('aptitude')">Aptitude</button>
+            <button class="nav-btn" onclick="switchPanel('applications')">Applications</button>
+            <button class="nav-btn" onclick="switchPanel('interviews')">Interviews</button>
+        </div>
+        <div class="nav-right">
+            <span class="user-chip" id="user-chip">Loading...</span>
+            <button class="logout-btn" onclick="doLogout()">Sign out</button>
+        </div>
+    </nav>
+
+    <div class="app-layout">
+        <!-- SIDEBAR -->
+        <div class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-label">Overview</div>
+                <button class="sidebar-item active" onclick="switchPanel('dashboard')"><span class="icon">⬡</span> Dashboard</button>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-label">Progress</div>
+                <button class="sidebar-item" onclick="switchPanel('coding')"><span class="icon">💻</span> Coding</button>
+                <button class="sidebar-item" onclick="switchPanel('aptitude')"><span class="icon">📊</span> Aptitude</button>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-label">Placement</div>
+                <button class="sidebar-item" onclick="switchPanel('applications')"><span class="icon">📋</span> Applications</button>
+                <button class="sidebar-item" onclick="switchPanel('interviews')"><span class="icon">🎯</span> Interviews</button>
+                <button class="sidebar-item" onclick="switchPanel('companies')"><span class="icon">🏢</span> Companies</button>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-label">Account</div>
+                <button class="sidebar-item" onclick="switchPanel('profile')"><span class="icon">👤</span> Profile</button>
+            </div>
+        </div>
+
+        <!-- PANELS -->
+        <div class="main-content">
+
+            <!-- DASHBOARD -->
+            <div class="panel active" id="panel-dashboard">
+                <div class="page-title">Dashboard</div>
+                <div class="page-sub">Your placement preparation overview</div>
+                <div id="dashboard-content"><div class="loading-row"><div class="spinner"></div> Loading dashboard…</div></div>
+            </div>
+
+            <!-- CODING -->
+            <div class="panel" id="panel-coding">
+                <div class="page-title">Coding Progress</div>
+                <div class="page-sub">Track LeetCode, GFG, and competitive programming</div>
+                <div class="card" style="margin-bottom:16px">
+                    <div class="card-title"><span class="icon">✏️</span> Update Progress</div>
+                    <div class="app-form">
+                        <div class="app-form-row">
+                            <div class="field"><label class="app-label">LeetCode Solved</label><input class="app-input" id="c-lc" type="number" placeholder="0"/></div>
+                            <div class="field"><label class="app-label">GFG Score</label><input class="app-input" id="c-gfg" type="number" placeholder="0"/></div>
+                        </div>
+                        <div class="app-form-row">
+                            <div class="field"><label class="app-label">Easy</label><input class="app-input" id="c-easy" type="number" placeholder="0"/></div>
+                            <div class="field"><label class="app-label">Medium</label><input class="app-input" id="c-med" type="number" placeholder="0"/></div>
+                        </div>
+                        <div class="app-form-row">
+                            <div class="field"><label class="app-label">Hard</label><input class="app-input" id="c-hard" type="number" placeholder="0"/></div>
+                            <div class="field"><label class="app-label">Current Streak (days)</label><input class="app-input" id="c-streak" type="number" placeholder="0"/></div>
+                        </div>
+                        <div class="field"><label class="app-label">Weak Topics (comma separated)</label><input class="app-input" id="c-weak" placeholder="DP, Trees, Graphs"/></div>
+                        <div class="field"><label class="app-label">Strong Topics (comma separated)</label><input class="app-input" id="c-strong" placeholder="Arrays, Hashing"/></div>
+                        <button class="btn btn-primary" style="width:fit-content" onclick="saveCoding()">Save Progress</button>
+                    </div>
+                </div>
+                <div id="coding-stats"><div class="loading-row"><div class="spinner"></div> Loading…</div></div>
+            </div>
+
+            <!-- APTITUDE -->
+            <div class="panel" id="panel-aptitude">
+                <div class="page-title">Aptitude Tracker</div>
+                <div class="page-sub">Track TCS NQT, Infosys, and campus drive preparation</div>
+                <div class="card" style="margin-bottom:16px">
+                    <div class="card-title"><span class="icon">✏️</span> Update Scores (0–100)</div>
+                    <div class="app-form">
+                        <div class="app-form-row">
+                            <div class="field"><label class="app-label">Quantitative Aptitude</label><input class="app-input" id="apt-q" type="number" placeholder="0–100"/></div>
+                            <div class="field"><label class="app-label">Verbal Ability</label><input class="app-input" id="apt-v" type="number" placeholder="0–100"/></div>
+                        </div>
+                        <div class="app-form-row">
+                            <div class="field"><label class="app-label">Logical Reasoning</label><input class="app-input" id="apt-l" type="number" placeholder="0–100"/></div>
+                            <div class="field"><label class="app-label">Data Interpretation</label><input class="app-input" id="apt-d" type="number" placeholder="0–100"/></div>
+                        </div>
+                        <div class="field"><label class="app-label">Practice Tests Taken</label><input class="app-input" id="apt-tests" type="number" placeholder="0"/></div>
+                        <button class="btn btn-primary" style="width:fit-content" onclick="saveAptitude()">Save Scores</button>
+                    </div>
+                </div>
+                <div id="aptitude-stats"><div class="loading-row"><div class="spinner"></div> Loading…</div></div>
+            </div>
+
+            <!-- APPLICATIONS -->
+            <div class="panel" id="panel-applications">
+                <div class="page-title">Application Tracker</div>
+                <div class="page-sub">Track every company application from applied to selected</div>
+                <div class="card" style="margin-bottom:16px">
+                    <div class="card-title"><span class="icon">➕</span> Add Application</div>
+                    <div class="app-form">
+                        <div class="app-form-row">
+                            <div class="field"><label class="app-label">Company ID</label><input class="app-input" id="app-co" type="number" placeholder="Enter company ID"/></div>
+                            <div class="field"><label class="app-label">Job Role</label><input class="app-input" id="app-role" placeholder="SDE Intern"/></div>
+                        </div>
+                        <div class="app-form-row">
+                            <div class="field"><label class="app-label">Applied Date</label><input class="app-input" id="app-date" type="date"/></div>
+                            <div class="field"><label class="app-label">Status</label>
+                                <select class="app-input" id="app-status">
+                                    <option value="APPLIED">Applied</option>
+                                    <option value="OA_PENDING">OA Pending</option>
+                                    <option value="OA_CLEARED">OA Cleared</option>
+                                    <option value="INTERVIEW_SCHEDULED">Interview Scheduled</option>
+                                    <option value="SELECTED">Selected 🎉</option>
+                                    <option value="REJECTED">Rejected</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="field"><label class="app-label">Notes</label><input class="app-input" id="app-notes" placeholder="Any notes…"/></div>
+                        <button class="btn btn-primary" style="width:fit-content" onclick="addApplication()">Add Application</button>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-title"><span class="icon">📋</span> My Applications</div>
+                    <div id="applications-list"><div class="loading-row"><div class="spinner"></div> Loading…</div></div>
+                </div>
+            </div>
+
+            <!-- INTERVIEWS -->
+            <div class="panel" id="panel-interviews">
+                <div class="page-title">Interview Tracker</div>
+                <div class="page-sub">Log and review your interview experiences</div>
+                <div class="card" style="margin-bottom:16px">
+                    <div class="card-title"><span class="icon">➕</span> Log Interview</div>
+                    <div class="app-form">
+                        <div class="app-form-row">
+                            <div class="field"><label class="app-label">Company ID</label><input class="app-input" id="iv-co" type="number" placeholder="Company ID"/></div>
+                            <div class="field"><label class="app-label">Interview Date & Time</label><input class="app-input" id="iv-date" type="datetime-local"/></div>
+                        </div>
+                        <div class="app-form-row">
+                            <div class="field"><label class="app-label">Round</label><input class="app-input" id="iv-round" type="number" value="1" min="1"/></div>
+                            <div class="field"><label class="app-label">Type</label>
+                                <select class="app-input" id="iv-type">
+                                    <option value="TECHNICAL">Technical</option>
+                                    <option value="HR">HR</option>
+                                    <option value="CODING">Coding</option>
+                                    <option value="MANAGERIAL">Managerial</option>
+                                    <option value="GROUP_DISCUSSION">Group Discussion</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="app-form-row">
+                            <div class="field"><label class="app-label">Outcome</label>
+                                <select class="app-input" id="iv-outcome">
+                                    <option value="PENDING">Pending</option>
+                                    <option value="PASSED">Passed</option>
+                                    <option value="FAILED">Failed</option>
+                                </select>
+                            </div>
+                            <div class="field"><label class="app-label">Self Rating (1–5)</label><input class="app-input" id="iv-rating" type="number" min="1" max="5" placeholder="4"/></div>
+                        </div>
+                        <div class="field"><label class="app-label">Feedback / Notes</label><input class="app-input" id="iv-feedback" placeholder="What went well, what to improve…"/></div>
+                        <div class="field"><label class="app-label">Topics Covered</label><input class="app-input" id="iv-topics" placeholder="Arrays, System Design, OOPS…"/></div>
+                        <button class="btn btn-primary" style="width:fit-content" onclick="addInterview()">Save Interview</button>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-title"><span class="icon">📅</span> Interview History</div>
+                    <div id="interviews-list"><div class="loading-row"><div class="spinner"></div> Loading…</div></div>
+                </div>
+            </div>
+
+            <!-- COMPANIES -->
+            <div class="panel" id="panel-companies">
+                <div class="page-title">Companies</div>
+                <div class="page-sub">Browse company-wise interview preparation resources</div>
+                <div style="display:flex;gap:8px;margin-bottom:16px">
+                    <input class="app-input" id="co-search" placeholder="Search company…" style="flex:1" oninput="searchCompanies()"/>
+                </div>
+                <div id="companies-list"><div class="loading-row"><div class="spinner"></div> Loading…</div></div>
+            </div>
+
+            <!-- PROFILE -->
+            <div class="panel" id="panel-profile">
+                <div class="page-title">My Profile</div>
+                <div class="page-sub">Update your placement profile</div>
+                <div class="card">
+                    <div class="card-title"><span class="icon">👤</span> Profile Details</div>
+                    <div id="profile-content"><div class="loading-row"><div class="spinner"></div> Loading…</div></div>
+                </div>
+            </div>
+
+        </div><!-- /main-content -->
+    </div><!-- /app-layout -->
+</div>
+
+<div id="toast"></div>
+
+<script>
+    // ── CONFIG ──────────────────────────────────────────────────────────────
+    // CHANGE THIS to your Railway URL after deployment
+    // For local testing: http://localhost:8080/api
+    const API = 'http://localhost:8080/api';
+
+    let TOKEN = localStorage.getItem('cf_token');
+    let USER  = JSON.parse(localStorage.getItem('cf_user') || 'null');
+
+    // ── UTILITIES ─────────────────────────────────────────────────────────
+    function showPage(id) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById('page-' + id).classList.add('active');
+    }
+
+    function switchPanel(id) {
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.sidebar-item,.nav-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('panel-' + id).classList.add('active');
+        document.querySelectorAll('[onclick*="switchPanel(\'' + id + '\')"]').forEach(b => b.classList.add('active'));
+        loadPanel(id);
+    }
+
+    function showAuth(tab) {
+        showPage('auth');
+        switchTab(tab);
+    }
+
+    function switchTab(t) {
+        document.getElementById('form-login').style.display  = t==='login'  ? '' : 'none';
+        document.getElementById('form-signup').style.display = t==='signup' ? '' : 'none';
+        document.getElementById('tab-login').classList.toggle('active',  t==='login');
+        document.getElementById('tab-signup').classList.toggle('active', t==='signup');
+    }
+
+    async function api(method, path, body) {
+        const opts = {
+            method,
+            headers: { 'Content-Type': 'application/json',
+                ...(TOKEN ? {'Authorization':'Bearer '+TOKEN} : {}) }
+        };
+        if (body) opts.body = JSON.stringify(body);
+        const r = await fetch(API + path, opts);
+        const data = await r.json();
+        return { ok: r.ok, status: r.status, data };
+    }
+
+    function toast(msg, type='') {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.className = 'show ' + type;
+        setTimeout(() => t.className = '', 3000);
+    }
+
+    function statusBadge(s) {
+        const m = {
+            APPLIED:'badge-blue',OA_PENDING:'badge-amber',OA_CLEARED:'badge-purple',
+            INTERVIEW_SCHEDULED:'badge-purple',INTERVIEW_DONE:'badge-amber',
+            SELECTED:'badge-green',REJECTED:'badge-red',ON_HOLD:'badge-gray',
+            PASSED:'badge-green',FAILED:'badge-red',PENDING:'badge-amber'
+        };
+        return `<span class="badge ${m[s]||'badge-gray'}">${s.replace(/_/g,' ')}</span>`;
+    }
+
+    function readinessColor(r) {
+        return r==='STRONG'?'var(--green)':r==='MODERATE'?'var(--amber)':'var(--red)';
+    }
+
+    // ── AUTH ──────────────────────────────────────────────────────────────
+    async function doLogin() {
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-password').value;
+        document.getElementById('login-err').textContent = '';
+        const {ok, data} = await api('POST', '/auth/login', {email, password});
+        if (ok && data.data) {
+            TOKEN = data.data.token;
+            USER  = {fullName: data.data.fullName, email: data.data.email, role: data.data.role};
+            localStorage.setItem('cf_token', TOKEN);
+            localStorage.setItem('cf_user', JSON.stringify(USER));
+            enterApp();
+        } else {
+            document.getElementById('login-err').textContent = data.message || 'Invalid credentials';
+        }
+    }
+
+    async function doSignup() {
+        const body = {
+            fullName: document.getElementById('su-name').value,
+            email:    document.getElementById('su-email').value,
+            password: document.getElementById('su-password').value,
+            college:  document.getElementById('su-college').value,
+            branch:   document.getElementById('su-branch').value,
+            graduationYear: +document.getElementById('su-year').value || null,
+            cgpa:     +document.getElementById('su-cgpa').value || null,
+        };
+        document.getElementById('signup-err').textContent = '';
+        const {ok, data} = await api('POST', '/auth/signup', body);
+        if (ok && data.data) {
+            TOKEN = data.data.token;
+            USER  = {fullName: data.data.fullName, email: data.data.email, role: data.data.role};
+            localStorage.setItem('cf_token', TOKEN);
+            localStorage.setItem('cf_user', JSON.stringify(USER));
+            enterApp();
+        } else {
+            document.getElementById('signup-err').textContent = data.message || 'Signup failed. Try again.';
+        }
+    }
+
+    function enterApp() {
+        document.getElementById('user-chip').textContent = USER?.fullName || USER?.email || 'User';
+        showPage('app');
+        loadPanel('dashboard');
+    }
+
+    function doLogout() {
+        TOKEN = null; USER = null;
+        localStorage.removeItem('cf_token');
+        localStorage.removeItem('cf_user');
+        showPage('landing');
+    }
+
+    // ── PANEL LOADERS ────────────────────────────────────────────────────
+    function loadPanel(id) {
+        if (id==='dashboard')    loadDashboard();
+        if (id==='coding')       loadCoding();
+        if (id==='aptitude')     loadAptitude();
+        if (id==='applications') loadApplications();
+        if (id==='interviews')   loadInterviews();
+        if (id==='companies')    loadCompanies();
+        if (id==='profile')      loadProfile();
+    }
+
+    // DASHBOARD
+    async function loadDashboard() {
+        const el = document.getElementById('dashboard-content');
+        el.innerHTML = '<div class="loading-row"><div class="spinner"></div> Loading dashboard…</div>';
+        const {ok, data} = await api('GET', '/dashboard');
+        if (!ok) { el.innerHTML = '<div class="empty"><p>Could not load dashboard. Make sure the backend is running.</p></div>'; return; }
+        const d = data.data || {};
+        const sr = d.successRate || '0%';
+
+        // App stats
+        const breakdown = d.applicationBreakdown || {};
+        const statuses = Object.entries(breakdown);
+
+        el.innerHTML = `
+    <div class="stat-grid">
+      <div class="stat-card stat-blue">
+        <div class="stat-label">Total Applications</div>
+        <div class="stat-value">${d.totalApplications||0}</div>
+        <div class="stat-sub">companies applied</div>
+      </div>
+      <div class="stat-card stat-green">
+        <div class="stat-label">Selected</div>
+        <div class="stat-value">${d.selectedCount||0}</div>
+        <div class="stat-sub">offers received</div>
+      </div>
+      <div class="stat-card stat-blue">
+        <div class="stat-label">LeetCode Solved</div>
+        <div class="stat-value">${d.leetcodeSolved||0}</div>
+        <div class="stat-sub">problems</div>
+      </div>
+      <div class="stat-card stat-amber">
+        <div class="stat-label">Interview Rating</div>
+        <div class="stat-value">${(d.averageInterviewRating||0).toFixed(1)}</div>
+        <div class="stat-sub">avg self rating / 5</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div class="card">
+        <div class="card-title"><span class="icon">💻</span> Coding Readiness</div>
+        <div style="font-size:28px;font-weight:700;color:${readinessColor(d.codingReadiness)};margin-bottom:4px">${d.codingReadiness||'BEGINNER'}</div>
+        <div style="font-size:12px;color:var(--muted)">Streak: <strong style="color:var(--text)">${d.currentStreak||0} days</strong></div>
+        ${d.weakTopics && d.weakTopics.length ? `<div style="margin-top:12px;font-size:12px;color:var(--muted)">Weak: ${d.weakTopics.map(t=>`<span style="background:rgba(248,81,73,.15);color:var(--red);padding:2px 8px;border-radius:10px;margin:2px;display:inline-block">${t}</span>`).join('')}</div>` : ''}
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="icon">📊</span> Placement Readiness</div>
+        <div style="font-size:28px;font-weight:700;color:${readinessColor(d.placementReadiness)};margin-bottom:4px">${d.placementReadiness||'—'}</div>
+        <div style="font-size:12px;color:var(--muted)">Aptitude score: <strong style="color:var(--text)">${d.aptitudeOverallScore||0}/100</strong></div>
+        ${d.aptitudeWeakestArea ? `<div style="margin-top:8px;font-size:12px;color:var(--muted)">Focus on: <strong style="color:var(--amber)">${d.aptitudeWeakestArea}</strong></div>` : ''}
+      </div>
+    </div>
+    ${statuses.length ? `
+    <div class="card" style="margin-top:16px">
+      <div class="card-title"><span class="icon">📋</span> Application Breakdown</div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px">
+        ${statuses.map(([s,c]) => `<div style="text-align:center;min-width:80px"><div style="font-size:20px;font-weight:700">${c}</div><div style="margin-top:4px">${statusBadge(s)}</div></div>`).join('')}
+      </div>
+    </div>` : ''}
+    <div style="text-align:right;margin-top:12px;font-size:11px;color:var(--muted)">
+      Success rate: ${sr} · Data refreshes every 5 minutes (Redis cached)
+    </div>
+  `;
+    }
+
+    // CODING
+    async function loadCoding() {
+        const {ok, data} = await api('GET', '/coding-progress/analytics');
+        const el = document.getElementById('coding-stats');
+        if (!ok) { el.innerHTML=''; return; }
+        const d = data.data || {};
+        const lc = d.leetcodeSolved||0;
+        const total = Math.max(lc, 1);
+        document.getElementById('c-lc').value    = d.leetcodeSolved||0;
+        document.getElementById('c-gfg').value   = d.gfgScore||0;
+        document.getElementById('c-easy').value  = d.easyCount||0;
+        document.getElementById('c-med').value   = d.mediumCount||0;
+        document.getElementById('c-hard').value  = d.hardCount||0;
+        document.getElementById('c-streak').value= d.currentStreak||0;
+        document.getElementById('c-weak').value  = (d.weakTopics||[]).join(', ');
+        document.getElementById('c-strong').value= (d.strongTopics||[]).join(', ');
+        el.innerHTML = `
+    <div class="stat-grid">
+      <div class="stat-card stat-blue"><div class="stat-label">Total Solved</div><div class="stat-value">${lc}</div></div>
+      <div class="stat-card"><div class="stat-label">Easy</div><div class="stat-value" style="color:var(--green)">${d.easyCount||0}</div></div>
+      <div class="stat-card"><div class="stat-label">Medium</div><div class="stat-value" style="color:var(--amber)">${d.mediumCount||0}</div></div>
+      <div class="stat-card"><div class="stat-label">Hard</div><div class="stat-value" style="color:var(--red)">${d.hardCount||0}</div></div>
+      <div class="stat-card stat-amber"><div class="stat-label">Streak</div><div class="stat-value">${d.currentStreak||0}</div><div class="stat-sub">days</div></div>
+      <div class="stat-card"><div class="stat-label">GFG Score</div><div class="stat-value" style="color:var(--green)">${d.gfgScore||0}</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="icon">📈</span> Distribution</div>
+      <div class="prog-item"><div class="prog-head"><span class="lbl">Easy</span><span>${d.easyCount||0}</span></div><div class="prog-bar"><div class="prog-fill" style="width:${(d.easyCount||0)/total*100}%;background:var(--green)"></div></div></div>
+      <div class="prog-item"><div class="prog-head"><span class="lbl">Medium</span><span>${d.mediumCount||0}</span></div><div class="prog-bar"><div class="prog-fill" style="width:${(d.mediumCount||0)/total*100}%;background:var(--amber)"></div></div></div>
+      <div class="prog-item"><div class="prog-head"><span class="lbl">Hard</span><span>${d.hardCount||0}</span></div><div class="prog-bar"><div class="prog-fill" style="width:${(d.hardCount||0)/total*100}%;background:var(--red)"></div></div></div>
+      <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
+        <span style="font-size:13px;color:var(--muted)">Readiness: </span>
+        <span style="font-weight:600;color:${readinessColor(d.codingReadiness)}">${d.codingReadiness||'BEGINNER'}</span>
+      </div>
+    </div>
+  `;
+    }
+
+    async function saveCoding() {
+        const weakRaw   = document.getElementById('c-weak').value;
+        const strongRaw = document.getElementById('c-strong').value;
+        const body = {
+            leetcodeSolved:   +document.getElementById('c-lc').value||0,
+            gfgScore:         +document.getElementById('c-gfg').value||0,
+            easyCount:        +document.getElementById('c-easy').value||0,
+            mediumCount:      +document.getElementById('c-med').value||0,
+            hardCount:        +document.getElementById('c-hard').value||0,
+            currentStreak:    +document.getElementById('c-streak').value||0,
+            weakTopics:   weakRaw   ? weakRaw.split(',').map(s=>s.trim()).filter(Boolean)   : [],
+            strongTopics: strongRaw ? strongRaw.split(',').map(s=>s.trim()).filter(Boolean) : [],
+        };
+        const {ok} = await api('PUT', '/coding-progress', body);
+        if (ok) { toast('Coding progress saved ✓', 'green'); loadCoding(); }
+        else     { toast('Failed to save', 'red'); }
+    }
+
+    // APTITUDE
+    async function loadAptitude() {
+        const {ok, data} = await api('GET', '/aptitude/analytics');
+        const el = document.getElementById('aptitude-stats');
+        if (!ok) { el.innerHTML=''; return; }
+        const d = data.data || {};
+        document.getElementById('apt-q').value     = d.quantScore||0;
+        document.getElementById('apt-v').value     = d.verbalScore||0;
+        document.getElementById('apt-l').value     = d.logicalScore||0;
+        document.getElementById('apt-d').value     = d.diScore||0;
+        document.getElementById('apt-tests').value = d.practiceTests||0;
+        el.innerHTML = `
+    <div class="stat-grid">
+      <div class="stat-card stat-blue"><div class="stat-label">Overall Score</div><div class="stat-value">${d.overallScore||0}</div><div class="stat-sub">out of 100</div></div>
+      <div class="stat-card"><div class="stat-label">Quantitative</div><div class="stat-value" style="color:var(--accent)">${d.quantScore||0}</div></div>
+      <div class="stat-card"><div class="stat-label">Verbal</div><div class="stat-value" style="color:var(--purple)">${d.verbalScore||0}</div></div>
+      <div class="stat-card"><div class="stat-label">Logical</div><div class="stat-value" style="color:var(--green)">${d.logicalScore||0}</div></div>
+      <div class="stat-card"><div class="stat-label">Data Interpretation</div><div class="stat-value" style="color:var(--amber)">${d.diScore||0}</div></div>
+      <div class="stat-card"><div class="stat-label">Tests Taken</div><div class="stat-value">${d.practiceTests||0}</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="icon">📊</span> Section Breakdown</div>
+      <div class="prog-item"><div class="prog-head"><span class="lbl">Quantitative</span><span>${d.quantScore||0}%</span></div><div class="prog-bar"><div class="prog-fill" style="width:${d.quantScore||0}%;background:var(--accent)"></div></div></div>
+      <div class="prog-item"><div class="prog-head"><span class="lbl">Verbal</span><span>${d.verbalScore||0}%</span></div><div class="prog-bar"><div class="prog-fill" style="width:${d.verbalScore||0}%;background:var(--purple)"></div></div></div>
+      <div class="prog-item"><div class="prog-head"><span class="lbl">Logical Reasoning</span><span>${d.logicalScore||0}%</span></div><div class="prog-bar"><div class="prog-fill" style="width:${d.logicalScore||0}%;background:var(--green)"></div></div></div>
+      <div class="prog-item"><div class="prog-head"><span class="lbl">Data Interpretation</span><span>${d.diScore||0}%</span></div><div class="prog-bar"><div class="prog-fill" style="width:${d.diScore||0}%;background:var(--amber)"></div></div></div>
+      <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:13px;color:var(--muted)">Weakest area: <strong style="color:var(--red)">${d.weakestArea||'—'}</strong></span>
+        <span>Readiness: <strong style="color:${readinessColor(d.placementReadiness)}">${d.placementReadiness||'—'}</strong></span>
+      </div>
+    </div>
+  `;
+    }
+
+    async function saveAptitude() {
+        const body = {
+            quantScore:   +document.getElementById('apt-q').value||0,
+            verbalScore:  +document.getElementById('apt-v').value||0,
+            logicalScore: +document.getElementById('apt-l').value||0,
+            diScore:      +document.getElementById('apt-d').value||0,
+            practiceTests:+document.getElementById('apt-tests').value||0,
+        };
+        const {ok} = await api('PUT', '/aptitude', body);
+        if (ok) { toast('Aptitude scores saved ✓', 'green'); loadAptitude(); }
+        else     { toast('Failed to save', 'red'); }
+    }
+
+    // APPLICATIONS
+    async function loadApplications() {
+        const el = document.getElementById('applications-list');
+        const {ok, data} = await api('GET', '/applications?page=0&size=50');
+        if (!ok || !data.data) { el.innerHTML='<div class="empty"><div class="big">📋</div><p>No applications yet. Add your first one above.</p></div>'; return; }
+        const apps = data.data.content || [];
+        if (!apps.length) { el.innerHTML='<div class="empty"><div class="big">📋</div><p>No applications yet. Add your first one above.</p></div>'; return; }
+        el.innerHTML = `<div class="table-wrap"><table>
+    <thead><tr><th>Company</th><th>Role</th><th>Applied</th><th>Status</th><th>Action</th></tr></thead>
+    <tbody>${apps.map(a=>`<tr>
+      <td><strong>${a.company?.name||'#'+a.company?.id||'—'}</strong></td>
+      <td>${a.jobRole||'—'}</td>
+      <td>${a.appliedDate||'—'}</td>
+      <td>${statusBadge(a.status)}</td>
+      <td><select class="app-input" style="font-size:11px;padding:3px 6px" onchange="updateAppStatus(${a.id}, this.value)">
+        ${['APPLIED','OA_PENDING','OA_CLEARED','INTERVIEW_SCHEDULED','INTERVIEW_DONE','SELECTED','REJECTED','ON_HOLD'].map(s=>`<option value="${s}" ${s===a.status?'selected':''}>${s.replace(/_/g,' ')}</option>`).join('')}
+      </select></td>
+    </tr>`).join('')}</tbody>
+  </table></div>`;
+    }
+
+    async function addApplication() {
+        const body = {
+            companyId:   +document.getElementById('app-co').value,
+            jobRole:      document.getElementById('app-role').value,
+            appliedDate:  document.getElementById('app-date').value||null,
+            status:       document.getElementById('app-status').value,
+            notes:        document.getElementById('app-notes').value,
+        };
+        if (!body.companyId) { toast('Enter a company ID', 'red'); return; }
+        const {ok, data} = await api('POST', '/applications', body);
+        if (ok) { toast('Application added ✓', 'green'); loadApplications(); }
+        else     { toast(data.message||'Failed to add', 'red'); }
+    }
+
+    async function updateAppStatus(id, status) {
+        const {ok} = await api('PATCH', `/applications/${id}/status?status=${status}`, null);
+        if (ok) toast('Status updated ✓', 'green');
+        else    toast('Update failed', 'red');
+    }
+
+    // INTERVIEWS
+    async function loadInterviews() {
+        const el = document.getElementById('interviews-list');
+        const {ok, data} = await api('GET', '/interviews');
+        if (!ok || !data.data) { el.innerHTML='<div class="empty"><div class="big">🎯</div><p>No interviews logged yet.</p></div>'; return; }
+        const list = data.data || [];
+        if (!list.length) { el.innerHTML='<div class="empty"><div class="big">🎯</div><p>No interviews logged yet.</p></div>'; return; }
+        el.innerHTML = `<div class="table-wrap"><table>
+    <thead><tr><th>Company</th><th>Date</th><th>Round</th><th>Type</th><th>Outcome</th><th>Rating</th></tr></thead>
+    <tbody>${list.map(i=>`<tr>
+      <td><strong>${i.company?.name||'#'+i.company?.id}</strong></td>
+      <td>${i.interviewDate ? i.interviewDate.replace('T',' ').slice(0,16) : '—'}</td>
+      <td>Round ${i.round||1}</td>
+      <td><span class="badge badge-blue">${(i.roundType||'—').replace(/_/g,' ')}</span></td>
+      <td>${statusBadge(i.outcome||'PENDING')}</td>
+      <td>${i.rating ? '★'.repeat(i.rating)+'☆'.repeat(5-i.rating) : '—'}</td>
+    </tr>`).join('')}</tbody>
+  </table></div>`;
+    }
+
+    async function addInterview() {
+        const body = {
+            companyId:     +document.getElementById('iv-co').value,
+            interviewDate:  document.getElementById('iv-date').value,
+            round:         +document.getElementById('iv-round').value||1,
+            roundType:      document.getElementById('iv-type').value,
+            outcome:        document.getElementById('iv-outcome').value,
+            rating:        +document.getElementById('iv-rating').value||null,
+            feedback:       document.getElementById('iv-feedback').value,
+            topicsCovered:  document.getElementById('iv-topics').value,
+            mode: 'ONLINE'
+        };
+        if (!body.companyId || !body.interviewDate) { toast('Company ID and date are required', 'red'); return; }
+        const {ok, data} = await api('POST', '/interviews', body);
+        if (ok) { toast('Interview saved ✓', 'green'); loadInterviews(); }
+        else     { toast(data.message||'Failed to save', 'red'); }
+    }
+
+    // COMPANIES
+    let _coTimer;
+    async function searchCompanies() {
+        clearTimeout(_coTimer);
+        _coTimer = setTimeout(loadCompanies, 300);
+    }
+
+    async function loadCompanies() {
+        const q = document.getElementById('co-search')?.value || '';
+        const el = document.getElementById('companies-list');
+        const endpoint = q ? `/companies/search?name=${encodeURIComponent(q)}&page=0&size=20` : '/companies?page=0&size=20';
+        const {ok, data} = await api('GET', endpoint);
+        if (!ok || !data.data) { el.innerHTML='<div class="empty"><p>No companies found. Add some via API.</p></div>'; return; }
+        const list = data.data.content || data.data || [];
+        if (!list.length) { el.innerHTML='<div class="empty"><div class="big">🏢</div><p>No companies yet.</p></div>'; return; }
+        el.innerHTML = `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px">
+    ${list.map(c=>`<div class="card" style="margin:0">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+        <strong style="font-size:14px">${c.name}</strong>
+        ${c.isDream?'<span class="badge badge-amber">Dream</span>':''}
+      </div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:6px">${c.industry||'—'}</div>
+      ${c.packageLpa?`<div style="font-size:13px;color:var(--green);font-weight:600">₹${c.packageLpa} LPA</div>`:''}
+      <div style="margin-top:8px">
+        <span class="badge ${c.difficultyLevel==='HARD'?'badge-red':c.difficultyLevel==='EASY'?'badge-green':'badge-amber'}">${c.difficultyLevel||'MEDIUM'}</span>
+      </div>
+    </div>`).join('')}
+  </div>`;
+    }
+
+    // PROFILE
+    async function loadProfile() {
+        const el = document.getElementById('profile-content');
+        const {ok, data} = await api('GET', '/users/me');
+        if (!ok || !data.data) { el.innerHTML='<div class="empty"><p>Could not load profile.</p></div>'; return; }
+        const u = data.data;
+        el.innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      ${[
+            ['Full Name', u.fullName],['Email', u.email],['Role', u.role],
+            ['College', u.college||'—'],['Branch', u.branch||'—'],
+            ['Grad Year', u.graduationYear||'—'],['CGPA', u.cgpa||'—'],
+            ['Phone', u.phone||'—'],['LinkedIn', u.linkedinUrl||'—'],['GitHub', u.githubUrl||'—'],
+        ].map(([l,v])=>`<div><div style="font-size:11px;color:var(--muted);margin-bottom:3px;text-transform:uppercase;letter-spacing:.4px">${l}</div><div style="font-size:14px">${v}</div></div>`).join('')}
+    </div>
+    <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border);font-size:12px;color:var(--muted)">
+      Member since ${u.createdAt ? new Date(u.createdAt).toLocaleDateString('en-IN',{month:'long',year:'numeric'}) : '—'}
+    </div>
+  `;
+    }
+
+    // ── INIT ──────────────────────────────────────────────────────────────
+    if (TOKEN && USER) {
+        enterApp();
+    } else {
+        showPage('landing');
+    }
+</script>
+</body>
+</html>
